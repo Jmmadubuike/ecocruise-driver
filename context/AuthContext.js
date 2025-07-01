@@ -17,15 +17,20 @@ export const AuthProvider = ({ children }) => {
       const res = await fetch(`${baseUrl}/api/v1/auth/me`, {
         credentials: 'include',
       });
+      if (!res.ok) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
       const data = await res.json();
-
-      if (res.ok && data.user) {
+      if (data.user) {
         setUser(data.user);
       } else {
         setUser(null);
       }
     } catch (error) {
       setUser(null);
+      console.error("fetchUser error:", error);
     } finally {
       setLoading(false);
     }
@@ -51,14 +56,14 @@ export const AuthProvider = ({ children }) => {
       if (data.user) {
         setUser(data.user);
       } else {
-        // fallback: refetch user data after login success
         await fetchUser();
       }
+    } catch (error) {
+      console.error("login error:", error);
+      throw error;
     } finally {
       setLoading(false);
     }
-
-    return;
   };
 
   const logout = async () => {
@@ -70,6 +75,8 @@ export const AuthProvider = ({ children }) => {
       });
       setUser(null);
       router.push('/login');
+    } catch (error) {
+      console.error("logout error:", error);
     } finally {
       setLoading(false);
     }

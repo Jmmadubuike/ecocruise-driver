@@ -11,10 +11,11 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log('LoginPage useEffect: user:', user, 'loading:', loading);
     if (!loading && user?.role === 'driver') {
       router.replace('/driver/dashboard');
     }
-  }, [user, loading, router]);
+  }, [user, loading]); // removed router
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -25,7 +26,6 @@ export default function LoginPage() {
     setError('');
     try {
       await login(form.email, form.password);
-      // Redirect handled by useEffect after login updates user & loading
     } catch (err) {
       setError(err.message || 'Login failed');
     }
@@ -55,7 +55,11 @@ export default function LoginPage() {
             value={form.password}
             required
           />
-          <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+          <button
+            type="submit"
+            className="btn btn-primary w-full"
+            disabled={loading}
+          >
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
