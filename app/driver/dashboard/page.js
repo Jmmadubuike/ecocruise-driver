@@ -24,7 +24,8 @@ import {
 import api from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Same stat, available, current card components as before...
+import { toast, Toaster } from "react-hot-toast";
+
 
 const StatCard = ({ icon, title, value }) => (
   <Card className="shadow-md">

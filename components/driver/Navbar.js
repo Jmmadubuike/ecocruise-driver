@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { toast } from 'react-hot-toast';
 
 const LOGOUT_ENDPOINT = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/auth/logout`;
 
@@ -23,10 +24,11 @@ export default function DriverNavbar() {
       });
       if (!res.ok) throw new Error('Logout failed');
       await fetchUser();
+      toast.success('Logout successful. Redirecting...');
       router.push('/login');
     } catch (error) {
       console.error('Logout failed', error);
-      alert('Logout failed. Please try again.');
+      toast.error('Logout failed. Please try again.');
     } finally {
       setLoggingOut(false);
     }
