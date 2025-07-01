@@ -18,30 +18,39 @@ export async function middleware(req) {
   const token = req.cookies.get('token')?.value;
   const loginUrl = new URL('/login', req.url);
 
-  // Public routes that do not require auth
+  console.log('MIDDLEWARE: checking path:', pathname);
+  console.log('MIDDLEWARE: cookies:', req.cookies.getAll());
+  console.log('MIDDLEWARE: token:', token);
+
+  // Public paths that do not require authentication
   const publicPaths = ['/login', '/driver/login', '/api'];
 
-  // Skip auth for public routes & API routes
+  // Allow access to public paths without checks
   if (publicPaths.some(path => pathname.startsWith(path))) {
+    console.log('MIDDLEWARE: public path, proceeding.');
     return NextResponse.next();
   }
 
-  // No token - redirect to login
+  // No token - redirect
   if (!token) {
+    console.log('MIDDLEWARE: no token, redirecting to login.');
     return NextResponse.redirect(loginUrl);
   }
 
-  // Verify JWT
+  // Verify token
   const decoded = await verifyJWT(token);
 
-  // Redirect if invalid token or wrong role
+  // Invalid or wrong role - redirect
   if (!decoded || decoded.role !== 'driver') {
+    console.log('MIDDLEWARE: invalid or unauthorized role, redirecting to login.');
     return NextResponse.redirect(loginUrl);
   }
 
+  console.log('MIDDLEWARE: verified, user:', decoded);
   return NextResponse.next();
 }
 
+// Adjust matcher to protect driver routes now, and easily extend later
 export const config = {
   matcher: ['/driver/:path*'],
 };

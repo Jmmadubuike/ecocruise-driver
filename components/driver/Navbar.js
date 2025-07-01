@@ -1,4 +1,3 @@
-// ✅ /components/driver/Navbar.js
 'use client';
 
 import Link from 'next/link';
@@ -26,8 +25,6 @@ export default function DriverNavbar() {
     }
   }, [fetchUser, router]);
 
-  if (loading) return null;
-
   return (
     <nav className="navbar sticky top-0 z-50 px-4 md:px-8 h-20 border-b border-[#004aad]/10 shadow-lg bg-white dark:bg-[#0a0a0a]">
       <div className="flex-1">
@@ -38,7 +35,6 @@ export default function DriverNavbar() {
             width={36}
             height={36}
             className="rounded"
-            style={{ height: 'auto' }}
             priority
           />
           <span className="text-xl font-bold text-[#004aad] hidden sm:inline">
@@ -48,7 +44,9 @@ export default function DriverNavbar() {
       </div>
 
       <div className="flex-none">
-        {user ? (
+        {loading ? (
+          <span className="loading loading-spinner loading-md"></span>
+        ) : user ? (
           <div className="dropdown dropdown-end" tabIndex={0}>
             <button
               className="btn btn-ghost btn-circle avatar ring ring-[#004aad] ring-offset-2"
