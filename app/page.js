@@ -1,95 +1,84 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import styles from "./page.module.css";
+import { useAuth } from "@/context/AuthContext";
 
-export default function Home() {
+export default function LandingPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user) {
+      if (user.role === "driver") {
+        router.push("/driver/dashboard");
+      } else {
+        // Block admins or other roles from using the driver app
+        router.push("/login");
+      }
+    }
+  }, [user, loading, router]);
+
+  if (loading || user) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <span className="loading loading-spinner text-primary text-3xl"></span>
+      </div>
+    );
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-base-200 via-white to-base-100 px-6 py-12">
+      <div className="max-w-3xl text-center space-y-6">
+        {/* Logo */}
         <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+          src="/logo.png"
+          alt="EcoCruise Logo"
+          width={72}
+          height={72}
+          className="mx-auto mb-2"
         />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+        {/* Headline */}
+        <h1 className="text-4xl md:text-5xl font-extrabold text-primary tracking-tight">
+          EcoCruise Driver Hub
+        </h1>
+
+        {/* Subtext */}
+        <p className="text-gray-600 text-lg md:text-xl">
+          Seamless ride coordination, earnings management, and route access for
+          campus transport drivers—all in one smart interface.
+        </p>
+
+        {/* Features */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 text-left text-sm text-gray-700">
+          <div className="bg-white p-4 rounded-lg shadow border-l-4 border-primary">
+            <h3 className="font-semibold text-primary mb-1">Live Ride Dashboard</h3>
+            <p>View assigned rides, manage lifecycle, and monitor progress effortlessly.</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow border-l-4 border-secondary">
+            <h3 className="font-semibold text-secondary mb-1">Route Discovery</h3>
+            <p>Browse and select available campus transport routes in real-time.</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow border-l-4 border-accent">
+            <h3 className="font-semibold text-accent mb-1">Earnings & Withdrawals</h3>
+            <p>Track earnings and request payouts with full transparency.</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow border-l-4 border-info">
+            <h3 className="font-semibold text-info mb-1">Support System</h3>
+            <p>Submit tickets and resolve ride-related issues quickly and efficiently.</p>
+          </div>
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        {/* CTA */}
+        <button
+          onClick={() => router.push("/login")}
+          className="btn btn-primary mt-8 px-6 py-3 text-lg font-semibold shadow-md hover:shadow-lg"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          Enter Driver Portal
+        </button>
+      </div>
     </div>
   );
 }
