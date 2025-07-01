@@ -17,20 +17,23 @@ export const AuthProvider = ({ children }) => {
       const res = await fetch(`${baseUrl}/api/v1/auth/me`, {
         credentials: 'include',
       });
+
       if (!res.ok) {
         setUser(null);
-        setLoading(false);
         return;
       }
+
       const data = await res.json();
       if (data.user) {
         setUser(data.user);
+      } else if (data._id) {
+        setUser(data);
       } else {
         setUser(null);
       }
     } catch (error) {
-      setUser(null);
       console.error("fetchUser error:", error);
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -52,9 +55,10 @@ export const AuthProvider = ({ children }) => {
       }
 
       const data = await res.json();
-
       if (data.user) {
         setUser(data.user);
+      } else if (data._id) {
+        setUser(data);
       } else {
         await fetchUser();
       }

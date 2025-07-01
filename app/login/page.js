@@ -12,10 +12,14 @@ export default function LoginPage() {
 
   useEffect(() => {
     console.log('LoginPage useEffect: user:', user, 'loading:', loading);
-    if (!loading && user?.role === 'driver') {
-      router.replace('/driver/dashboard');
+    if (!loading) {
+      if (user?.role === 'driver') {
+        router.replace('/driver/dashboard');
+      } else if (user) {
+        router.replace('/');
+      }
     }
-  }, [user, loading]); // removed router
+  }, [user, loading, router]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -30,6 +34,14 @@ export default function LoginPage() {
       setError(err.message || 'Login failed');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-base-200">
