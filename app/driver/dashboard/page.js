@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
+import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +23,8 @@ import {
 } from "react-icons/fi";
 import api from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
+
+// Same stat, available, current card components as before...
 
 const StatCard = ({ icon, title, value }) => (
   <Card className="shadow-md">
@@ -129,6 +132,8 @@ const DashboardSkeleton = () => (
 
 const DriverDashboard = () => {
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
+
   const [data, setData] = useState(null);
   const [availableRides, setAvailableRides] = useState([]);
   const [currentRides, setCurrentRides] = useState([]);
@@ -140,6 +145,17 @@ const DriverDashboard = () => {
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [supportForm, setSupportForm] = useState({ subject: "", message: "" });
   const [supportLoading, setSupportLoading] = useState(false);
+
+  // AUTH GUARD
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        router.replace("/login");
+      } else if (user.role !== "driver") {
+        router.replace("/");
+      }
+    }
+  }, [authLoading, user, router]);
 
   const fetchData = useCallback(async () => {
     try {
@@ -161,8 +177,10 @@ const DriverDashboard = () => {
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (user?.role === "driver") {
+      fetchData();
+    }
+  }, [fetchData, user]);
 
   const handleAcceptRide = async (rideId) => {
     try {
@@ -200,9 +218,7 @@ const DriverDashboard = () => {
   const toggleOnlineStatus = async () => {
     try {
       setTogglingOnline(true);
-      const endpoint = isOnline
-        ? "/api/v1/driver/offline"
-        : "/api/v1/driver/online";
+      const endpoint = isOnline ? "/api/v1/driver/offline" : "/api/v1/driver/online";
       await api.patch(endpoint);
       setIsOnline((prev) => !prev);
     } catch (err) {
@@ -228,41 +244,19 @@ const DriverDashboard = () => {
     }
   };
 
-  if (loading) return <DashboardSkeleton />;
+  const isLoading = authLoading || loading;
+
+  if (isLoading) return <DashboardSkeleton />;
   if (error) return <p className="p-4 text-red-600">{error}</p>;
   if (!data) return <p className="p-4">No data available</p>;
 
   const stats = [
-    {
-      title: "Total Earnings",
-      value: `₦${data.totalEarnings?.toLocaleString() || "0"}`,
-      icon: <FiDollarSign className="text-green-600" />,
-    },
-    {
-      title: "Monthly Earnings",
-      value: `₦${data.monthlyEarnings?.toLocaleString() || "0"}`,
-      icon: <FiTrendingUp className="text-blue-500" />,
-    },
-    {
-      title: "Daily Earnings",
-      value: `₦${data.dailyEarnings?.toLocaleString() || "0"}`,
-      icon: <FiActivity className="text-yellow-500" />,
-    },
-    {
-      title: "Completed Rides",
-      value: data.completedRides || 0,
-      icon: <FiCheckCircle className="text-emerald-600" />,
-    },
-    {
-      title: "Total Rides",
-      value: data.totalRides || 0,
-      icon: <FiClock className="text-gray-500" />,
-    },
-    {
-      title: "Pending Withdrawals",
-      value: data.pendingWithdrawals || 0,
-      icon: <FiXOctagon className="text-red-500" />,
-    },
+    { title: "Total Earnings", value: `₦${data.totalEarnings?.toLocaleString() || "0"}`, icon: <FiDollarSign className="text-green-600" /> },
+    { title: "Monthly Earnings", value: `₦${data.monthlyEarnings?.toLocaleString() || "0"}`, icon: <FiTrendingUp className="text-blue-500" /> },
+    { title: "Daily Earnings", value: `₦${data.dailyEarnings?.toLocaleString() || "0"}`, icon: <FiActivity className="text-yellow-500" /> },
+    { title: "Completed Rides", value: data.completedRides || 0, icon: <FiCheckCircle className="text-emerald-600" /> },
+    { title: "Total Rides", value: data.totalRides || 0, icon: <FiClock className="text-gray-500" /> },
+    { title: "Pending Withdrawals", value: data.pendingWithdrawals || 0, icon: <FiXOctagon className="text-red-500" /> },
   ];
 
   return (
