@@ -10,12 +10,11 @@ export default function LoginPage() {
   const { login, user, loading } = useAuth();
   const router = useRouter();
 
-  // ✅ If user is already logged in, redirect immediately
   useEffect(() => {
     if (!loading && user?.role === 'driver') {
       router.replace('/driver/dashboard');
     }
-  }, [user, loading]);
+  }, [user, loading, router]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -26,7 +25,7 @@ export default function LoginPage() {
     setError('');
     try {
       await login(form.email, form.password);
-      // 🔁 Redirect will now happen automatically via useEffect
+      // Redirect handled by useEffect after login updates user & loading
     } catch (err) {
       setError(err.message || 'Login failed');
     }
@@ -56,8 +55,8 @@ export default function LoginPage() {
             value={form.password}
             required
           />
-          <button type="submit" className="btn btn-primary w-full">
-            Login
+          <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
       </div>

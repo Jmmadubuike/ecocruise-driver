@@ -12,14 +12,19 @@ export const AuthProvider = ({ children }) => {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const fetchUser = async () => {
+    setLoading(true);
     try {
       const res = await fetch(`${baseUrl}/api/v1/auth/me`, {
         credentials: 'include',
       });
       const data = await res.json();
-      if (res.ok && data.user) setUser(data.user);
-      else setUser(null);
-    } catch {
+
+      if (res.ok && data.user) {
+        setUser(data.user);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
       setUser(null);
     } finally {
       setLoading(false);
@@ -27,30 +32,47 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (email, password) => {
-  const res = await fetch(`${baseUrl}/api/v1/auth/login`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
+    setLoading(true);
+    try {
+      const res = await fetch(`${baseUrl}/api/v1/auth/login`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error?.error || 'Login failed');
-  }
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error?.error || 'Login failed');
+      }
 
-  const data = await res.json();
-  setUser(data.user); // ✅ Immediately update user context
-  return data;
-};
+      const data = await res.json();
+
+      if (data.user) {
+        setUser(data.user);
+      } else {
+        // fallback: refetch user data after login success
+        await fetchUser();
+      }
+    } finally {
+      setLoading(false);
+    }
+
+    return;
+  };
 
   const logout = async () => {
-    await fetch(`${baseUrl}/api/v1/auth/logout`, {
-      method: 'POST',
-      credentials: 'include',
-    });
-    setUser(null);
-    router.push('/login');
+    setLoading(true);
+    try {
+      await fetch(`${baseUrl}/api/v1/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      setUser(null);
+      router.push('/login');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

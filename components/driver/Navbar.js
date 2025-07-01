@@ -20,7 +20,7 @@ export default function DriverNavbar() {
         credentials: 'include',
       });
       await fetchUser();
-      router.push('/driver/login');
+      router.push('/login');
     } catch (error) {
       console.error('Logout failed', error);
     }
@@ -91,7 +91,7 @@ export default function DriverNavbar() {
           </div>
         ) : (
           <Link
-            href="/driver/login"
+            href="/login"
             className="bg-[#004aad] hover:bg-[#f80b0b] btn border-none text-white transition-colors duration-200"
             aria-label="Login"
           >
