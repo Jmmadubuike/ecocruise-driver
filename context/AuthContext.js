@@ -7,22 +7,23 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [loginLoading, setLoginLoading] = useState(false);
   const router = useRouter();
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const fetchUser = async () => {
-    setLoading(true);
+    if (user) {
+      setInitialLoading(false); 
+      return;
+    }
+    setInitialLoading(true);
     try {
-      const res = await fetch(`${baseUrl}/api/v1/auth/me`, {
-        credentials: 'include',
-      });
-
+      const res = await fetch(`${baseUrl}/api/v1/auth/me`, { credentials: 'include' });
       if (!res.ok) {
         setUser(null);
         return;
       }
-
       const data = await res.json();
       if (data.user) {
         setUser(data.user);
@@ -31,16 +32,16 @@ export const AuthProvider = ({ children }) => {
       } else {
         setUser(null);
       }
-    } catch (error) {
-      console.error("fetchUser error:", error);
+    } catch (err) {
+      console.error("fetchUser error:", err);
       setUser(null);
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
     }
   };
 
   const login = async (email, password) => {
-    setLoading(true);
+    setLoginLoading(true);
     try {
       const res = await fetch(`${baseUrl}/api/v1/auth/login`, {
         method: 'POST',
@@ -48,12 +49,10 @@ export const AuthProvider = ({ children }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error?.error || 'Login failed');
       }
-
       const data = await res.json();
       if (data.user) {
         setUser(data.user);
@@ -62,16 +61,16 @@ export const AuthProvider = ({ children }) => {
       } else {
         await fetchUser();
       }
-    } catch (error) {
-      console.error("login error:", error);
-      throw error;
+    } catch (err) {
+      console.error("login error:", err);
+      throw err;
     } finally {
-      setLoading(false);
+      setLoginLoading(false);
     }
   };
 
   const logout = async () => {
-    setLoading(true);
+    setInitialLoading(true); 
     try {
       await fetch(`${baseUrl}/api/v1/auth/logout`, {
         method: 'POST',
@@ -79,16 +78,18 @@ export const AuthProvider = ({ children }) => {
       });
       setUser(null);
       router.push('/login');
-    } catch (error) {
-      console.error("logout error:", error);
+    } catch (err) {
+      console.error("logout error:", err);
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
     }
   };
 
   useEffect(() => {
     fetchUser();
   }, []);
+
+  const loading = initialLoading || loginLoading;
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout, fetchUser }}>

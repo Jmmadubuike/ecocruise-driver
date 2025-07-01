@@ -11,15 +11,14 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log('LoginPage useEffect: user:', user, 'loading:', loading);
-    if (!loading) {
-      if (user?.role === 'driver') {
+    if (!loading && user) {
+      if (user.role === 'driver') {
         router.replace('/driver/dashboard');
-      } else if (user) {
+      } else {
         router.replace('/');
       }
     }
-  }, [user, loading, router]);
+  }, [loading, user, router]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
