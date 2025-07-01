@@ -1,4 +1,6 @@
 // ✅ RideCard Component Example with RejectRideModal usage
+'use client';
+
 import { RejectRideModal } from './RejectRideModal';
 
 export function RideCard({ ride, onReject }) {

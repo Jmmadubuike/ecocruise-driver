@@ -1,4 +1,6 @@
 // ✅ Ride Rejection Confirmation Modal (Reusable, with animation, toast, and auto-close)
+'use client';
+
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 

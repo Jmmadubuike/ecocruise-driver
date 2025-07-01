@@ -7,7 +7,6 @@ const quickLinks = [
   { href: "/driver/wallet", label: "Wallet" },
   { href: "/driver/support", label: "Support" },
   { href: "/driver/routes/available", label: "Routes" },
-  { href: "/driver/notifications", label: "Notifications" },
 ];
 
 export default function Footer() {
