@@ -78,6 +78,12 @@ export default function LandingPage() {
         >
           Enter Driver Portal
         </button>
+        <button
+            onClick={() => router.push("/register")}
+            className="border border-[#004aad] text-[#004aad] px-6 py-3 text-lg font-semibold rounded hover:bg-[#004aad] hover:text-white transition"
+          >
+            Register
+          </button>
       </div>
     </div>
   );
