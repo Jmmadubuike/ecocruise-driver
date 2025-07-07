@@ -26,7 +26,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { toast, Toaster } from "react-hot-toast";
 
-
 const StatCard = ({ icon, title, value }) => (
   <Card className="shadow-md">
     <CardContent className="flex items-center gap-4 p-6">
@@ -43,7 +42,13 @@ const AvailableRideCard = ({ ride, acceptingRideId, onAccept }) => (
   <Card className="shadow-sm border border-gray-200">
     <CardContent className="p-4 space-y-2">
       <div className="flex items-center gap-2 text-sm text-gray-600">
-        <FiUser /> {ride.customer?.name || "Unnamed"}
+        <FiUser />
+        <div>
+          <div>{ride.customer?.name || "Unnamed"}</div>
+          <div className="text-sm text-gray-500">
+            {ride.customer?.phone || "No phone"}
+          </div>
+        </div>
       </div>
       <div className="flex items-center gap-2 text-sm">
         <FiMapPin /> {ride.route?.startPoint} → {ride.route?.endPoint}
@@ -219,7 +224,9 @@ const DriverDashboard = () => {
   const toggleOnlineStatus = async () => {
     try {
       setTogglingOnline(true);
-      const endpoint = isOnline ? "/api/v1/driver/offline" : "/api/v1/driver/online";
+      const endpoint = isOnline
+        ? "/api/v1/driver/offline"
+        : "/api/v1/driver/online";
       await api.patch(endpoint);
       setIsOnline((prev) => !prev);
     } catch (err) {
@@ -252,26 +259,67 @@ const DriverDashboard = () => {
   if (!data) return <p className="p-4">No data available</p>;
 
   const stats = [
-    { title: "Total Earnings", value: `₦${data.totalEarnings?.toLocaleString() || "0"}`, icon: <FiDollarSign className="text-green-600" /> },
-    { title: "Monthly Earnings", value: `₦${data.monthlyEarnings?.toLocaleString() || "0"}`, icon: <FiTrendingUp className="text-blue-500" /> },
-    { title: "Daily Earnings", value: `₦${data.dailyEarnings?.toLocaleString() || "0"}`, icon: <FiActivity className="text-yellow-500" /> },
-    { title: "Completed Rides", value: data.completedRides || 0, icon: <FiCheckCircle className="text-emerald-600" /> },
-    { title: "Total Rides", value: data.totalRides || 0, icon: <FiClock className="text-gray-500" /> },
-    { title: "Pending Withdrawals", value: data.pendingWithdrawals || 0, icon: <FiXOctagon className="text-red-500" /> },
+    {
+      title: "Total Earnings",
+      value: `₦${data.totalEarnings?.toLocaleString() || "0"}`,
+      icon: <FiDollarSign className="text-green-600" />,
+    },
+    {
+      title: "Monthly Earnings",
+      value: `₦${data.monthlyEarnings?.toLocaleString() || "0"}`,
+      icon: <FiTrendingUp className="text-blue-500" />,
+    },
+    {
+      title: "Daily Earnings",
+      value: `₦${data.dailyEarnings?.toLocaleString() || "0"}`,
+      icon: <FiActivity className="text-yellow-500" />,
+    },
+    {
+      title: "Completed Rides",
+      value: data.completedRides || 0,
+      icon: <FiCheckCircle className="text-emerald-600" />,
+    },
+    {
+      title: "Total Rides",
+      value: data.totalRides || 0,
+      icon: <FiClock className="text-gray-500" />,
+    },
+    {
+      title: "Pending Withdrawals",
+      value: data.pendingWithdrawals || 0,
+      icon: <FiXOctagon className="text-red-500" />,
+    },
   ];
 
   return (
     <div className="p-4 space-y-6">
       <div className="flex justify-end gap-3">
-        <Button onClick={() => router.push("/driver/withdrawals")} variant="outline" className="flex items-center gap-2">
+        <Button
+          onClick={() => router.push("/driver/withdrawals")}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
           <FiSend className="text-indigo-600" /> Withdraw
         </Button>
-        <Button onClick={() => setShowSupportModal(true)} variant="outline" className="flex items-center gap-2">
+        <Button
+          onClick={() => setShowSupportModal(true)}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
           <FiHelpCircle className="text-orange-500" /> Support
         </Button>
-        <Button onClick={toggleOnlineStatus} disabled={togglingOnline} variant={isOnline ? "destructive" : "default"} className="text-sm flex items-center gap-2">
+        <Button
+          onClick={toggleOnlineStatus}
+          disabled={togglingOnline}
+          variant={isOnline ? "destructive" : "default"}
+          className="text-sm flex items-center gap-2"
+        >
           {isOnline ? <FiWifiOff /> : <FiWifi />}
-          {togglingOnline ? "Updating..." : isOnline ? "Go Offline" : "Go Online"}
+          {togglingOnline
+            ? "Updating..."
+            : isOnline
+            ? "Go Offline"
+            : "Go Online"}
         </Button>
       </div>
 
@@ -283,18 +331,27 @@ const DriverDashboard = () => {
               type="text"
               placeholder="Subject"
               value={supportForm.subject}
-              onChange={(e) => setSupportForm({ ...supportForm, subject: e.target.value })}
+              onChange={(e) =>
+                setSupportForm({ ...supportForm, subject: e.target.value })
+              }
               className="w-full border p-2 rounded-md"
             />
             <textarea
               rows={4}
               placeholder="Describe your issue..."
               value={supportForm.message}
-              onChange={(e) => setSupportForm({ ...supportForm, message: e.target.value })}
+              onChange={(e) =>
+                setSupportForm({ ...supportForm, message: e.target.value })
+              }
               className="w-full border p-2 rounded-md"
             />
             <div className="flex justify-end gap-2">
-              <Button onClick={() => setShowSupportModal(false)} variant="outline">Cancel</Button>
+              <Button
+                onClick={() => setShowSupportModal(false)}
+                variant="outline"
+              >
+                Cancel
+              </Button>
               <Button onClick={submitSupportTicket} disabled={supportLoading}>
                 {supportLoading ? "Submitting..." : "Submit"}
               </Button>
@@ -305,7 +362,12 @@ const DriverDashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {stats.map((stat, index) => (
-          <StatCard key={index} icon={stat.icon} title={stat.title} value={stat.value} />
+          <StatCard
+            key={index}
+            icon={stat.icon}
+            title={stat.title}
+            value={stat.value}
+          />
         ))}
       </div>
 
@@ -313,10 +375,17 @@ const DriverDashboard = () => {
         <h2 className="text-lg font-bold mb-2">Available Rides</h2>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {availableRides.length === 0 ? (
-            <p className="text-gray-600 col-span-full">No available rides at the moment.</p>
+            <p className="text-gray-600 col-span-full">
+              No available rides at the moment.
+            </p>
           ) : (
             availableRides.map((ride) => (
-              <AvailableRideCard key={ride._id} ride={ride} acceptingRideId={acceptingRideId} onAccept={handleAcceptRide} />
+              <AvailableRideCard
+                key={ride._id}
+                ride={ride}
+                acceptingRideId={acceptingRideId}
+                onAccept={handleAcceptRide}
+              />
             ))
           )}
         </div>
@@ -327,7 +396,12 @@ const DriverDashboard = () => {
           <h2 className="text-lg font-bold mt-6 mb-2">Current Rides</h2>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {currentRides.map((ride) => (
-              <CurrentRideCard key={ride._id} ride={ride} onStart={handleStartRide} onEnd={handleEndRide} />
+              <CurrentRideCard
+                key={ride._id}
+                ride={ride}
+                onStart={handleStartRide}
+                onEnd={handleEndRide}
+              />
             ))}
           </div>
         </div>
