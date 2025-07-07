@@ -42,13 +42,7 @@ const AvailableRideCard = ({ ride, acceptingRideId, onAccept }) => (
   <Card className="shadow-sm border border-gray-200">
     <CardContent className="p-4 space-y-2">
       <div className="flex items-center gap-2 text-sm text-gray-600">
-        <FiUser />
-        <div>
-          <div>{ride.customer?.name || "Unnamed"}</div>
-          <div className="text-sm text-gray-500">
-            {ride.customer?.phone || "No phone"}
-          </div>
-        </div>
+        <FiUser /> {ride.customer?.name || "Unnamed"}
       </div>
       <div className="flex items-center gap-2 text-sm">
         <FiMapPin /> {ride.route?.startPoint} → {ride.route?.endPoint}
@@ -75,7 +69,13 @@ const CurrentRideCard = ({ ride, onStart, onEnd }) => {
     <Card className="shadow border border-blue-400">
       <CardContent className="p-4 space-y-2">
         <div className="text-sm text-gray-700">
-          Customer: {ride.customer?.name || "Unnamed"}
+          <FiUser />
+          <div>
+            <div>{ride.customer?.name || "Unnamed"}</div>
+            <div className="text-sm text-gray-500">
+              {ride.customer?.phone || "No phone"}
+            </div>
+          </div>
         </div>
         <div className="text-sm">
           Route: {ride.route?.startPoint} → {ride.route?.endPoint}
