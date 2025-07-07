@@ -3,6 +3,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import ToastProvider from "@/components/providers/ToastProvider";
 import Navbar from "@/components/driver/Navbar";
 import Footer from "@/components/driver/Footer";
+import ExpiryWarning from "@/components/common/ExpiryWarning";
 
 export default function DriverRootLayout({ children }) {
   return (
@@ -10,7 +11,7 @@ export default function DriverRootLayout({ children }) {
       <body className="flex flex-col min-h-screen bg-base-100">
         <AuthProvider>
           <ToastProvider />
-          
+
           {/* Sticky Navbar on top */}
           <Navbar />
 
@@ -21,6 +22,7 @@ export default function DriverRootLayout({ children }) {
 
           {/* Sticky footer */}
           <Footer />
+          <ExpiryWarning />
         </AuthProvider>
       </body>
     </html>

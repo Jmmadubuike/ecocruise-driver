@@ -24,8 +24,6 @@ import {
 import api from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { toast, Toaster } from "react-hot-toast";
-
 const StatCard = ({ icon, title, value }) => (
   <Card className="shadow-md">
     <CardContent className="flex items-center gap-4 p-6">
@@ -42,14 +40,14 @@ const AvailableRideCard = ({ ride, acceptingRideId, onAccept }) => (
   <Card className="shadow-sm border border-gray-200">
     <CardContent className="p-4 space-y-2">
       <div className="flex items-center gap-2 text-sm text-gray-600">
-        <FiUser /> {ride.customer?.name || "Unnamed"}
+        <FiUser /> {ride.customer && ride.customer.name ? ride.customer.name : "Unnamed"}
       </div>
       <div className="flex items-center gap-2 text-sm">
         <FiMapPin /> {ride.route?.startPoint} → {ride.route?.endPoint}
       </div>
       <div className="text-sm">Passengers: {ride.passengers}</div>
       <div className="text-sm font-semibold text-green-700">
-        ₦{ride.amount?.toLocaleString()}
+        ₦{(ride.amount || 0).toLocaleString()}
       </div>
       <Button
         size="sm"
@@ -64,17 +62,15 @@ const AvailableRideCard = ({ ride, acceptingRideId, onAccept }) => (
 );
 
 const CurrentRideCard = ({ ride, onStart, onEnd }) => {
-  const status = ride.status?.trim().toLowerCase();
+  const status = (ride.status || "").trim().toLowerCase();
   return (
     <Card className="shadow border border-blue-400">
       <CardContent className="p-4 space-y-2">
-        <div className="text-sm text-gray-700">
+        <div className="text-sm text-gray-700 flex items-center gap-2">
           <FiUser />
           <div>
             <div>{ride.customer?.name || "Unnamed"}</div>
-            <div className="text-sm text-gray-500">
-              {ride.customer?.phone || "No phone"}
-            </div>
+            <div className="text-sm text-gray-500">{ride.customer?.phone || "No phone"}</div>
           </div>
         </div>
         <div className="text-sm">
@@ -82,18 +78,12 @@ const CurrentRideCard = ({ ride, onStart, onEnd }) => {
         </div>
         <div className="text-sm">Passengers: {ride.passengers}</div>
         <div className="text-sm font-semibold text-green-700">
-          ₦{ride.amount?.toLocaleString()}
+          ₦{(ride.amount || 0).toLocaleString()}
         </div>
-        <div className="text-sm text-blue-600 font-medium">
-          Status: {ride.status}
-        </div>
+        <div className="text-sm text-blue-600 font-medium">Status: {ride.status}</div>
         <div className="flex gap-2 mt-3">
           {status === "accepted" && (
-            <Button
-              onClick={() => onStart(ride._id)}
-              size="sm"
-              className="flex items-center gap-1"
-            >
+            <Button onClick={() => onStart(ride._id)} size="sm" className="flex items-center gap-1">
               <FiPlayCircle /> Start Ride
             </Button>
           )}
@@ -136,7 +126,7 @@ const DashboardSkeleton = () => (
   </div>
 );
 
-const DriverDashboard = () => {
+export default function DriverDashboard() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
 
@@ -152,7 +142,6 @@ const DriverDashboard = () => {
   const [supportForm, setSupportForm] = useState({ subject: "", message: "" });
   const [supportLoading, setSupportLoading] = useState(false);
 
-  // AUTH GUARD
   useEffect(() => {
     if (!authLoading) {
       if (!user) {
@@ -176,7 +165,7 @@ const DriverDashboard = () => {
       setCurrentRides(currentRes.data?.currentRides || []);
     } catch (err) {
       console.error("Failed to fetch data:", err);
-      setError("Failed to load dashboard data. Please try again.");
+      setError("Failed to load dashboard data.");
     } finally {
       setLoading(false);
     }
@@ -194,7 +183,6 @@ const DriverDashboard = () => {
       await api.patch(`/api/v1/driver/rides/${rideId}/accept`);
       await fetchData();
     } catch (err) {
-      console.error("Failed to accept ride:", err);
       alert("Failed to accept ride.");
     } finally {
       setAcceptingRideId(null);
@@ -206,7 +194,6 @@ const DriverDashboard = () => {
       await api.patch(`/api/v1/driver/rides/${rideId}/start`);
       await fetchData();
     } catch (err) {
-      console.error("Failed to start ride:", err);
       alert("Failed to start ride.");
     }
   };
@@ -216,7 +203,6 @@ const DriverDashboard = () => {
       await api.patch(`/api/v1/driver/rides/${rideId}/end`);
       await fetchData();
     } catch (err) {
-      console.error("Failed to end ride:", err);
       alert("Failed to end ride.");
     }
   };
@@ -224,13 +210,10 @@ const DriverDashboard = () => {
   const toggleOnlineStatus = async () => {
     try {
       setTogglingOnline(true);
-      const endpoint = isOnline
-        ? "/api/v1/driver/offline"
-        : "/api/v1/driver/online";
+      const endpoint = isOnline ? "/api/v1/driver/offline" : "/api/v1/driver/online";
       await api.patch(endpoint);
       setIsOnline((prev) => !prev);
     } catch (err) {
-      console.error("Failed to toggle online status:", err);
       alert("Failed to toggle online status.");
     } finally {
       setTogglingOnline(false);
@@ -245,7 +228,6 @@ const DriverDashboard = () => {
       setShowSupportModal(false);
       setSupportForm({ subject: "", message: "" });
     } catch (err) {
-      console.error("Failed to submit support ticket:", err);
       alert("Failed to submit support ticket.");
     } finally {
       setSupportLoading(false);
@@ -253,25 +235,27 @@ const DriverDashboard = () => {
   };
 
   const isLoading = authLoading || loading;
-
   if (isLoading) return <DashboardSkeleton />;
   if (error) return <p className="p-4 text-red-600">{error}</p>;
   if (!data) return <p className="p-4">No data available</p>;
 
+  const displayName =
+    user?.name || `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || user?.email;
+
   const stats = [
     {
       title: "Total Earnings",
-      value: `₦${data.totalEarnings?.toLocaleString() || "0"}`,
+      value: `₦${(data.totalEarnings || 0).toLocaleString()}`,
       icon: <FiDollarSign className="text-green-600" />,
     },
     {
       title: "Monthly Earnings",
-      value: `₦${data.monthlyEarnings?.toLocaleString() || "0"}`,
+      value: `₦${(data.monthlyEarnings || 0).toLocaleString()}`,
       icon: <FiTrendingUp className="text-blue-500" />,
     },
     {
       title: "Daily Earnings",
-      value: `₦${data.dailyEarnings?.toLocaleString() || "0"}`,
+      value: `₦${(data.dailyEarnings || 0).toLocaleString()}`,
       icon: <FiActivity className="text-yellow-500" />,
     },
     {
@@ -293,19 +277,21 @@ const DriverDashboard = () => {
 
   return (
     <div className="p-4 space-y-6">
+      <header className="mb-8 flex flex-col sm:flex-row sm:justify-between sm:items-center">
+        <h1 className="flex items-center gap-3 font-extrabold text-2xl md:text-3xl">
+          <FiUser className="text-[#f80b0b]" />
+          Welcome back, <span className="text-[#004aad] dark:text-[#0070f3]">{displayName}</span>
+        </h1>
+        <p className="mt-2 sm:mt-0 text-gray-600 dark:text-gray-400 text-sm">
+          Here’s your dashboard summary at a glance.
+        </p>
+      </header>
+
       <div className="flex justify-end gap-3">
-        <Button
-          onClick={() => router.push("/driver/withdrawals")}
-          variant="outline"
-          className="flex items-center gap-2"
-        >
+        <Button onClick={() => router.push("/driver/withdrawals")} variant="outline" className="flex items-center gap-2">
           <FiSend className="text-indigo-600" /> Withdraw
         </Button>
-        <Button
-          onClick={() => setShowSupportModal(true)}
-          variant="outline"
-          className="flex items-center gap-2"
-        >
+        <Button onClick={() => setShowSupportModal(true)} variant="outline" className="flex items-center gap-2">
           <FiHelpCircle className="text-orange-500" /> Support
         </Button>
         <Button
@@ -315,11 +301,7 @@ const DriverDashboard = () => {
           className="text-sm flex items-center gap-2"
         >
           {isOnline ? <FiWifiOff /> : <FiWifi />}
-          {togglingOnline
-            ? "Updating..."
-            : isOnline
-            ? "Go Offline"
-            : "Go Online"}
+          {togglingOnline ? "Updating..." : isOnline ? "Go Offline" : "Go Online"}
         </Button>
       </div>
 
@@ -331,27 +313,18 @@ const DriverDashboard = () => {
               type="text"
               placeholder="Subject"
               value={supportForm.subject}
-              onChange={(e) =>
-                setSupportForm({ ...supportForm, subject: e.target.value })
-              }
+              onChange={(e) => setSupportForm({ ...supportForm, subject: e.target.value })}
               className="w-full border p-2 rounded-md"
             />
             <textarea
               rows={4}
               placeholder="Describe your issue..."
               value={supportForm.message}
-              onChange={(e) =>
-                setSupportForm({ ...supportForm, message: e.target.value })
-              }
+              onChange={(e) => setSupportForm({ ...supportForm, message: e.target.value })}
               className="w-full border p-2 rounded-md"
             />
             <div className="flex justify-end gap-2">
-              <Button
-                onClick={() => setShowSupportModal(false)}
-                variant="outline"
-              >
-                Cancel
-              </Button>
+              <Button onClick={() => setShowSupportModal(false)} variant="outline">Cancel</Button>
               <Button onClick={submitSupportTicket} disabled={supportLoading}>
                 {supportLoading ? "Submitting..." : "Submit"}
               </Button>
@@ -362,12 +335,7 @@ const DriverDashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {stats.map((stat, index) => (
-          <StatCard
-            key={index}
-            icon={stat.icon}
-            title={stat.title}
-            value={stat.value}
-          />
+          <StatCard key={index} icon={stat.icon} title={stat.title} value={stat.value} />
         ))}
       </div>
 
@@ -375,9 +343,7 @@ const DriverDashboard = () => {
         <h2 className="text-lg font-bold mb-2">Available Rides</h2>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {availableRides.length === 0 ? (
-            <p className="text-gray-600 col-span-full">
-              No available rides at the moment.
-            </p>
+            <p className="text-gray-600 col-span-full">No available rides at the moment.</p>
           ) : (
             availableRides.map((ride) => (
               <AvailableRideCard
@@ -408,6 +374,4 @@ const DriverDashboard = () => {
       )}
     </div>
   );
-};
-
-export default DriverDashboard;
+}
