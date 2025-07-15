@@ -27,10 +27,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 const StatCard = ({ icon, title, value }) => (
   <Card className="shadow-md">
     <CardContent className="flex items-center gap-4 p-6">
-      <div className="text-2xl">{icon}</div>
+      <div className="text-xl sm:text-2xl">{icon}</div>
       <div>
-        <h2 className="text-sm text-gray-500">{title}</h2>
-        <p className="text-xl font-semibold">{value}</p>
+        <h2 className="text-xs sm:text-sm text-gray-500">{title}</h2>
+        <p className="text-lg sm:text-xl font-semibold">{value}</p>
       </div>
     </CardContent>
   </Card>
@@ -39,19 +39,19 @@ const StatCard = ({ icon, title, value }) => (
 const AvailableRideCard = ({ ride, acceptingRideId, onAccept }) => (
   <Card className="shadow-sm border border-gray-200">
     <CardContent className="p-4 space-y-2">
-      <div className="flex items-center gap-2 text-sm text-gray-600">
+      <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
         <FiUser /> {ride.customer && ride.customer.name ? ride.customer.name : "Unnamed"}
       </div>
-      <div className="flex items-center gap-2 text-sm">
+      <div className="flex items-center gap-2 text-xs sm:text-sm">
         <FiMapPin /> {ride.route?.startPoint} → {ride.route?.endPoint}
       </div>
-      <div className="text-sm">Passengers: {ride.passengers}</div>
-      <div className="text-sm font-semibold text-green-700">
+      <div className="text-xs sm:text-sm">Passengers: {ride.passengers}</div>
+      <div className="text-xs sm:text-sm font-semibold text-green-700">
         ₦{(ride.amount || 0).toLocaleString()}
       </div>
       <Button
         size="sm"
-        className="w-full mt-2"
+        className="w-full mt-2 text-xs sm:text-sm"
         disabled={acceptingRideId === ride._id}
         onClick={() => onAccept(ride._id)}
       >
@@ -66,24 +66,24 @@ const CurrentRideCard = ({ ride, onStart, onEnd }) => {
   return (
     <Card className="shadow border border-blue-400">
       <CardContent className="p-4 space-y-2">
-        <div className="text-sm text-gray-700 flex items-center gap-2">
+        <div className="text-xs sm:text-sm text-gray-700 flex items-center gap-2">
           <FiUser />
           <div>
             <div>{ride.customer?.name || "Unnamed"}</div>
-            <div className="text-sm text-gray-500">{ride.customer?.phone || "No phone"}</div>
+            <div className="text-xs sm:text-sm text-gray-500">{ride.customer?.phone || "No phone"}</div>
           </div>
         </div>
-        <div className="text-sm">
+        <div className="text-xs sm:text-sm">
           Route: {ride.route?.startPoint} → {ride.route?.endPoint}
         </div>
-        <div className="text-sm">Passengers: {ride.passengers}</div>
-        <div className="text-sm font-semibold text-green-700">
+        <div className="text-xs sm:text-sm">Passengers: {ride.passengers}</div>
+        <div className="text-xs sm:text-sm font-semibold text-green-700">
           ₦{(ride.amount || 0).toLocaleString()}
         </div>
-        <div className="text-sm text-blue-600 font-medium">Status: {ride.status}</div>
+        <div className="text-xs sm:text-sm text-blue-600 font-medium">Status: {ride.status}</div>
         <div className="flex gap-2 mt-3">
           {status === "accepted" && (
-            <Button onClick={() => onStart(ride._id)} size="sm" className="flex items-center gap-1">
+            <Button onClick={() => onStart(ride._id)} size="sm" className="text-xs sm:text-sm flex items-center gap-1">
               <FiPlayCircle /> Start Ride
             </Button>
           )}
@@ -92,7 +92,7 @@ const CurrentRideCard = ({ ride, onStart, onEnd }) => {
               onClick={() => onEnd(ride._id)}
               size="sm"
               variant="destructive"
-              className="flex items-center gap-1"
+              className="text-xs sm:text-sm flex items-center gap-1"
             >
               <FiStopCircle /> End Ride
             </Button>
