@@ -289,32 +289,32 @@ export default function DriverDashboard() {
   ];
 
   return (
-    <div className="p-4 space-y-6">
-      <header className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:justify-between sm:items-center">
-        <h1 className="flex items-center gap-2 font-bold text-xl md:text-2xl">
+    <div className="p-4 space-y-6 text-xs sm:text-sm">
+      <header className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+        <h1 className="flex items-center gap-2 font-bold text-lg sm:text-xl md:text-2xl">
           <FiUser className="text-[#f80b0b]" />
-          Welcome back,{" "}
+          Welcome back,
           <span className="text-[#004aad] dark:text-[#0070f3]">
             {displayName}
           </span>
         </h1>
-        <p className="mt-2 sm:mt-0 text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-gray-600 dark:text-gray-400">
           Here’s your dashboard summary at a glance.
         </p>
       </header>
 
-      <div className="flex justify-end gap-3 text-xs sm:text-sm">
+      <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
         <Button
           onClick={() => router.push("/driver/withdrawals")}
           variant="outline"
-          className="flex items-center gap-2"
+          className="flex items-center justify-center gap-1 sm:gap-2 w-full sm:w-auto text-xs sm:text-sm"
         >
           <FiSend className="text-indigo-600" /> Withdraw
         </Button>
         <Button
           onClick={() => setShowSupportModal(true)}
           variant="outline"
-          className="flex items-center gap-2"
+          className="flex items-center justify-center gap-1 sm:gap-2 w-full sm:w-auto text-xs sm:text-sm"
         >
           <FiHelpCircle className="text-orange-500" /> Support
         </Button>
@@ -322,7 +322,7 @@ export default function DriverDashboard() {
           onClick={toggleOnlineStatus}
           disabled={togglingOnline}
           variant={isOnline ? "destructive" : "default"}
-          className="flex items-center gap-2 text-xs sm:text-sm"
+          className="flex items-center justify-center gap-1 sm:gap-2 w-full sm:w-auto text-xs sm:text-sm"
         >
           {isOnline ? <FiWifiOff /> : <FiWifi />}
           {togglingOnline
@@ -334,9 +334,9 @@ export default function DriverDashboard() {
       </div>
 
       {showSupportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white p-6 rounded-xl shadow-md max-w-md w-full space-y-4">
-            <h2 className="text-lg font-bold">Support Ticket</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4">
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-md max-w-md w-full space-y-4">
+            <h2 className="text-base sm:text-lg font-bold">Support Ticket</h2>
             <input
               type="text"
               placeholder="Subject"
@@ -344,7 +344,7 @@ export default function DriverDashboard() {
               onChange={(e) =>
                 setSupportForm({ ...supportForm, subject: e.target.value })
               }
-              className="w-full border p-2 rounded-md"
+              className="w-full border p-2 rounded-md text-xs sm:text-sm"
             />
             <textarea
               rows={4}
@@ -353,16 +353,21 @@ export default function DriverDashboard() {
               onChange={(e) =>
                 setSupportForm({ ...supportForm, message: e.target.value })
               }
-              className="w-full border p-2 rounded-md"
+              className="w-full border p-2 rounded-md text-xs sm:text-sm"
             />
-            <div className="flex justify-end gap-2">
+            <div className="flex flex-col sm:flex-row justify-end gap-2">
               <Button
                 onClick={() => setShowSupportModal(false)}
                 variant="outline"
+                className="w-full sm:w-auto text-xs sm:text-sm"
               >
                 Cancel
               </Button>
-              <Button onClick={submitSupportTicket} disabled={supportLoading}>
+              <Button
+                onClick={submitSupportTicket}
+                disabled={supportLoading}
+                className="w-full sm:w-auto text-xs sm:text-sm"
+              >
                 {supportLoading ? "Submitting..." : "Submit"}
               </Button>
             </div>
@@ -370,52 +375,104 @@ export default function DriverDashboard() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {stats.map((stat, index) => (
-          <StatCard
-            key={index}
-            icon={stat.icon}
-            title={stat.title}
-            value={stat.value}
-          />
-        ))}
-      </div>
-
-      <div>
-        <h2 className="text-lg font-bold mb-2">Available Rides</h2>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {availableRides.length === 0 ? (
-            <p className="text-gray-600 col-span-full">
-              No available rides at the moment.
-            </p>
-          ) : (
-            availableRides.map((ride) => (
-              <AvailableRideCard
-                key={ride._id}
-                ride={ride}
-                acceptingRideId={acceptingRideId}
-                onAccept={handleAcceptRide}
-              />
-            ))
-          )}
-        </div>
-      </div>
-
-      {currentRides.length > 0 && (
-        <div>
-          <h2 className="text-lg font-bold mt-6 mb-2">Current Rides</h2>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {currentRides.map((ride) => (
-              <CurrentRideCard
-                key={ride._id}
-                ride={ride}
-                onStart={handleStartRide}
-                onEnd={handleEndRide}
+      <div className="md:hidden">
+        <details className="mb-4">
+          <summary className="cursor-pointer font-semibold">Statistics</summary>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+            {stats.map((stat, index) => (
+              <StatCard
+                key={index}
+                icon={stat.icon}
+                title={stat.title}
+                value={stat.value}
               />
             ))}
           </div>
+        </details>
+        <details className="mb-4">
+          <summary className="cursor-pointer font-semibold">
+            Available Rides
+          </summary>
+          <div className="grid gap-4 mt-2">
+            {availableRides.length === 0 ? (
+              <p className="text-gray-600">No available rides at the moment.</p>
+            ) : (
+              availableRides.map((ride) => (
+                <AvailableRideCard
+                  key={ride._id}
+                  ride={ride}
+                  acceptingRideId={acceptingRideId}
+                  onAccept={handleAcceptRide}
+                />
+              ))
+            )}
+          </div>
+        </details>
+        {currentRides.length > 0 && (
+          <details className="mb-4">
+            <summary className="cursor-pointer font-semibold">
+              Current Rides
+            </summary>
+            <div className="grid gap-4 mt-2">
+              {currentRides.map((ride) => (
+                <CurrentRideCard
+                  key={ride._id}
+                  ride={ride}
+                  onStart={handleStartRide}
+                  onEnd={handleEndRide}
+                />
+              ))}
+            </div>
+          </details>
+        )}
+      </div>
+
+      <div className="hidden md:block space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {stats.map((stat, index) => (
+            <StatCard
+              key={index}
+              icon={stat.icon}
+              title={stat.title}
+              value={stat.value}
+            />
+          ))}
         </div>
-      )}
+        <div>
+          <h2 className="text-lg font-bold mb-2">Available Rides</h2>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {availableRides.length === 0 ? (
+              <p className="text-gray-600 col-span-full">
+                No available rides at the moment.
+              </p>
+            ) : (
+              availableRides.map((ride) => (
+                <AvailableRideCard
+                  key={ride._id}
+                  ride={ride}
+                  acceptingRideId={acceptingRideId}
+                  onAccept={handleAcceptRide}
+                />
+              ))
+            )}
+          </div>
+        </div>
+        {currentRides.length > 0 && (
+          <div>
+            <h2 className="text-lg font-bold mt-6 mb-2">Current Rides</h2>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {currentRides.map((ride) => (
+                <CurrentRideCard
+                  key={ride._id}
+                  ride={ride}
+                  onStart={handleStartRide}
+                  onEnd={handleEndRide}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
