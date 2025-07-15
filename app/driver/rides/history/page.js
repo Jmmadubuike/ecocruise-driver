@@ -41,7 +41,7 @@ export default function DriverRideHistoryPage() {
         ...prev,
         page: meta?.page || 1,
         totalPages: meta?.totalPages || 1,
-        totalItems: meta?.totalItems || 0,
+        totalItems: meta?.total || 0, // ✅ FIXED
       }));
     } catch (err) {
       console.error("Error loading rides:", err);
@@ -83,26 +83,16 @@ export default function DriverRideHistoryPage() {
       "Date",
     ];
     const rows = rides.map((ride) => [
-      ride.customer
-        ? ride.customer.firstName
-          ? `${ride.customer.firstName} ${ride.customer.lastName}`
-          : ride.customer.name || "N/A"
-        : "N/A",
-
+      ride.customer?.firstName
+        ? `${ride.customer.firstName} ${ride.customer.lastName}`
+        : ride.customer?.name || "N/A",
       ride.route
         ? `${ride.route.startPoint || "?"} → ${ride.route.endPoint || "?"}`
         : "N/A",
-
       ride.passengers ?? 0,
-
-      ride.type && ["single", "multi"].includes(ride.type)
-        ? ride.type
-        : "Single",
-
+      ["single", "multi"].includes(ride.type) ? ride.type : "single",
       ride.amount ?? 0,
-
       ride.status?.toUpperCase() || "UNKNOWN",
-
       dayjs(ride.createdAt).format("DD MMM YYYY, hh:mm A"),
     ]);
 
@@ -140,7 +130,7 @@ export default function DriverRideHistoryPage() {
       {/* Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="stat bg-base-100 border border-gray-200">
-          <div className="stat-title text-[#004aad]">Total Rides</div>
+          <div className="stat-title text-[#004aad]">Total Rides (All)</div>
           <div className="stat-value">{pagination.totalItems}</div>
         </div>
         <div className="stat bg-base-100 border border-gray-200">
@@ -163,7 +153,7 @@ export default function DriverRideHistoryPage() {
         </div>
       </div>
 
-      {/* Filter & Actions */}
+      {/* Filters + Actions */}
       <div className="flex flex-wrap gap-4 justify-start items-center mb-4">
         <label className="form-control w-full max-w-xs">
           <span className="label-text">Filter by Status</span>
@@ -208,7 +198,7 @@ export default function DriverRideHistoryPage() {
         </button>
       </div>
 
-      {/* Loader / Error / Table */}
+      {/* Content Table */}
       {loading ? (
         <div className="flex justify-center py-10">
           <span className="loading loading-spinner text-[#004aad]"></span>
@@ -245,13 +235,19 @@ export default function DriverRideHistoryPage() {
                     {(pagination.page - 1) * pagination.limit + index + 1}
                   </td>
                   <td>
-                    {ride.customer?.firstName} {ride.customer?.lastName}
+                    {ride.customer?.firstName
+                      ? `${ride.customer.firstName} ${ride.customer.lastName}`
+                      : ride.customer?.name || "N/A"}
                   </td>
                   <td>
                     {ride.route?.startPoint} → {ride.route?.endPoint}
                   </td>
                   <td>{ride.passengers}</td>
-                  <td className="capitalize">{ride.type}</td>
+                  <td className="capitalize">
+                    {["single", "multi"].includes(ride.type)
+                      ? ride.type
+                      : "single"}
+                  </td>
                   <td>₦{ride.amount?.toLocaleString()}</td>
                   <td>
                     <span
