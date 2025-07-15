@@ -5,6 +5,14 @@ import Navbar from "@/components/driver/Navbar";
 import Footer from "@/components/driver/Footer";
 import ExpiryWarning from "@/components/common/ExpiryWarning";
 
+// ✅ Metadata API (JS syntax)
+export const metadata = {
+  title: "EcoCruise Driver",
+  icons: {
+    icon: "/logo.png", // favicon in /public/logo.png
+  },
+};
+
 export default function DriverRootLayout({ children }) {
   return (
     <html lang="en" className="h-full">
