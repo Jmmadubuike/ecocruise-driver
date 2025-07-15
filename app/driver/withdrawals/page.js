@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import api from "@/lib/api";
-import { FiDollarSign } from "react-icons/fi";
+import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 
 const WithdrawalManagement = () => {
   const [withdrawals, setWithdrawals] = useState([]);
@@ -13,6 +13,9 @@ const WithdrawalManagement = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     const fetchWithdrawals = async () => {
@@ -40,12 +43,20 @@ const WithdrawalManagement = () => {
 
       const updated = await api.get("/api/v1/driver/withdrawals");
       setWithdrawals(updated.data.data);
+      setPage(1); // Reset to first page
     } catch (err) {
       setError(err.response?.data?.error || "Withdrawal failed.");
     } finally {
       setSubmitting(false);
     }
   };
+
+  const paginatedData = withdrawals.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
+
+  const totalPages = Math.ceil(withdrawals.length / itemsPerPage);
 
   return (
     <div className="px-4 py-6 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-6">
@@ -55,9 +66,7 @@ const WithdrawalManagement = () => {
       </div>
 
       <div className="bg-white rounded-xl shadow-lg p-5 sm:p-6 space-y-4 border-l-4 border-[#004aad]">
-        <label className="block text-sm font-semibold text-gray-700">
-          Amount to Withdraw
-        </label>
+        <label className="block text-sm font-semibold text-gray-700">Amount to Withdraw</label>
         <input
           type="number"
           value={amount}
@@ -83,44 +92,71 @@ const WithdrawalManagement = () => {
         ) : withdrawals.length === 0 ? (
           <p className="text-sm text-gray-500">No withdrawal requests yet.</p>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
-            {withdrawals.map((w) => (
-              <Card
-                key={w._id}
-                className="bg-white border-l-4 shadow-sm"
-                style={{
-                  borderColor:
-                    w.status === "approved"
-                      ? "#22c55e"
-                      : w.status === "rejected"
-                      ? "#f80b0b"
-                      : "#eab308",
-                }}
+          <>
+            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
+              {paginatedData.map((w) => (
+                <Card
+                  key={w._id}
+                  className="bg-white border-l-4 shadow-sm"
+                  style={{
+                    borderColor:
+                      w.status === "approved"
+                        ? "#22c55e"
+                        : w.status === "rejected"
+                        ? "#f80b0b"
+                        : "#eab308",
+                  }}
+                >
+                  <CardContent className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                      <p className="font-semibold text-lg text-gray-800">
+                        ₦{w.amount.toLocaleString("en-NG")}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(w.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                    <span
+                      className={`text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wide ${
+                        w.status === "pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : w.status === "approved"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {w.status}
+                    </span>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="flex justify-between items-center mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                disabled={page === 1}
+                className="flex items-center gap-1"
               >
-                <CardContent className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                  <div>
-                    <p className="font-semibold text-lg text-gray-800">
-                      ₦{w.amount.toLocaleString("en-NG")}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {new Date(w.createdAt).toLocaleString()}
-                    </p>
-                  </div>
-                  <span
-                    className={`text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wide ${
-                      w.status === "pending"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : w.status === "approved"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {w.status}
-                  </span>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                <FiArrowLeft className="text-sm" />
+                Prev
+              </Button>
+              <span className="text-sm font-medium text-gray-700">
+                Page {page} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                disabled={page === totalPages}
+                className="flex items-center gap-1"
+              >
+                Next
+                <FiArrowRight className="text-sm" />
+              </Button>
+            </div>
+          </>
         )}
       </div>
     </div>
