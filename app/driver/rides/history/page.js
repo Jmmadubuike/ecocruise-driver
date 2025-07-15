@@ -83,12 +83,26 @@ export default function DriverRideHistoryPage() {
       "Date",
     ];
     const rows = rides.map((ride) => [
-      `${ride.customer?.firstName || ""} ${ride.customer?.lastName || ""}`,
-      `${ride.route?.startPoint || ""} → ${ride.route?.endPoint || ""}`,
-      ride.passengers || 0,
-      ride.type,
-      ride.amount || 0,
-      ride.status,
+      ride.customer
+        ? ride.customer.firstName
+          ? `${ride.customer.firstName} ${ride.customer.lastName}`
+          : ride.customer.name || "N/A"
+        : "N/A",
+
+      ride.route
+        ? `${ride.route.startPoint || "?"} → ${ride.route.endPoint || "?"}`
+        : "N/A",
+
+      ride.passengers ?? 0,
+
+      ride.type && ["single", "multi"].includes(ride.type)
+        ? ride.type
+        : "Single",
+
+      ride.amount ?? 0,
+
+      ride.status?.toUpperCase() || "UNKNOWN",
+
       dayjs(ride.createdAt).format("DD MMM YYYY, hh:mm A"),
     ]);
 
@@ -205,7 +219,9 @@ export default function DriverRideHistoryPage() {
         <div className="text-center text-gray-500 mt-8">
           No rides found for the selected filters.
           <br />
-          <span className="text-sm text-[#004aad]">Try adjusting your filters or refreshing.</span>
+          <span className="text-sm text-[#004aad]">
+            Try adjusting your filters or refreshing.
+          </span>
         </div>
       ) : (
         <div className="overflow-x-auto">
@@ -225,26 +241,36 @@ export default function DriverRideHistoryPage() {
             <tbody>
               {rides.map((ride, index) => (
                 <tr key={ride._id}>
-                  <td>{(pagination.page - 1) * pagination.limit + index + 1}</td>
-                  <td>{ride.customer?.firstName} {ride.customer?.lastName}</td>
-                  <td>{ride.route?.startPoint} → {ride.route?.endPoint}</td>
+                  <td>
+                    {(pagination.page - 1) * pagination.limit + index + 1}
+                  </td>
+                  <td>
+                    {ride.customer?.firstName} {ride.customer?.lastName}
+                  </td>
+                  <td>
+                    {ride.route?.startPoint} → {ride.route?.endPoint}
+                  </td>
                   <td>{ride.passengers}</td>
                   <td className="capitalize">{ride.type}</td>
                   <td>₦{ride.amount?.toLocaleString()}</td>
                   <td>
-                    <span className={`badge capitalize ${
-                      ride.status === "completed"
-                        ? "badge-success"
-                        : ride.status === "pending"
-                        ? "badge-warning"
-                        : ride.status === "cancelled"
-                        ? "badge-error"
-                        : "badge-info"
-                    }`}>
+                    <span
+                      className={`badge capitalize ${
+                        ride.status === "completed"
+                          ? "badge-success"
+                          : ride.status === "pending"
+                          ? "badge-warning"
+                          : ride.status === "cancelled"
+                          ? "badge-error"
+                          : "badge-info"
+                      }`}
+                    >
                       {ride.status}
                     </span>
                   </td>
-                  <td>{dayjs(ride.createdAt).format("DD MMM, YYYY hh:mm A")}</td>
+                  <td>
+                    {dayjs(ride.createdAt).format("DD MMM, YYYY hh:mm A")}
+                  </td>
                 </tr>
               ))}
             </tbody>
