@@ -40,7 +40,8 @@ const AvailableRideCard = ({ ride, acceptingRideId, onAccept }) => (
   <Card className="shadow-sm border border-gray-200">
     <CardContent className="p-4 space-y-2">
       <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-        <FiUser /> {ride.customer && ride.customer.name ? ride.customer.name : "Unnamed"}
+        <FiUser />{" "}
+        {ride.customer && ride.customer.name ? ride.customer.name : "Unnamed"}
       </div>
       <div className="flex items-center gap-2 text-xs sm:text-sm">
         <FiMapPin /> {ride.route?.startPoint} → {ride.route?.endPoint}
@@ -70,7 +71,9 @@ const CurrentRideCard = ({ ride, onStart, onEnd }) => {
           <FiUser />
           <div>
             <div>{ride.customer?.name || "Unnamed"}</div>
-            <div className="text-xs sm:text-sm text-gray-500">{ride.customer?.phone || "No phone"}</div>
+            <div className="text-xs sm:text-sm text-gray-500">
+              {ride.customer?.phone || "No phone"}
+            </div>
           </div>
         </div>
         <div className="text-xs sm:text-sm">
@@ -80,10 +83,16 @@ const CurrentRideCard = ({ ride, onStart, onEnd }) => {
         <div className="text-xs sm:text-sm font-semibold text-green-700">
           ₦{(ride.amount || 0).toLocaleString()}
         </div>
-        <div className="text-xs sm:text-sm text-blue-600 font-medium">Status: {ride.status}</div>
+        <div className="text-xs sm:text-sm text-blue-600 font-medium">
+          Status: {ride.status}
+        </div>
         <div className="flex gap-2 mt-3">
           {status === "accepted" && (
-            <Button onClick={() => onStart(ride._id)} size="sm" className="text-xs sm:text-sm flex items-center gap-1">
+            <Button
+              onClick={() => onStart(ride._id)}
+              size="sm"
+              className="text-xs sm:text-sm flex items-center gap-1"
+            >
               <FiPlayCircle /> Start Ride
             </Button>
           )}
@@ -210,7 +219,9 @@ export default function DriverDashboard() {
   const toggleOnlineStatus = async () => {
     try {
       setTogglingOnline(true);
-      const endpoint = isOnline ? "/api/v1/driver/offline" : "/api/v1/driver/online";
+      const endpoint = isOnline
+        ? "/api/v1/driver/offline"
+        : "/api/v1/driver/online";
       await api.patch(endpoint);
       setIsOnline((prev) => !prev);
     } catch (err) {
@@ -240,7 +251,9 @@ export default function DriverDashboard() {
   if (!data) return <p className="p-4">No data available</p>;
 
   const displayName =
-    user?.name || `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || user?.email;
+    user?.name ||
+    `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
+    user?.email;
 
   const stats = [
     {
@@ -281,28 +294,42 @@ export default function DriverDashboard() {
         <h1 className="flex items-center gap-2 font-bold text-xl md:text-2xl">
           <FiUser className="text-[#f80b0b]" />
           Welcome back,{" "}
-          <span className="text-[#004aad] dark:text-[#0070f3]">{displayName}</span>
+          <span className="text-[#004aad] dark:text-[#0070f3]">
+            {displayName}
+          </span>
         </h1>
         <p className="mt-2 sm:mt-0 text-sm text-gray-600 dark:text-gray-400">
           Here’s your dashboard summary at a glance.
         </p>
       </header>
 
-      <div className="flex justify-end gap-3">
-        <Button onClick={() => router.push("/driver/withdrawals")} variant="outline" className="flex items-center gap-2">
+      <div className="flex justify-end gap-3 text-xs sm:text-sm">
+        <Button
+          onClick={() => router.push("/driver/withdrawals")}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
           <FiSend className="text-indigo-600" /> Withdraw
         </Button>
-        <Button onClick={() => setShowSupportModal(true)} variant="outline" className="flex items-center gap-2">
+        <Button
+          onClick={() => setShowSupportModal(true)}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
           <FiHelpCircle className="text-orange-500" /> Support
         </Button>
         <Button
           onClick={toggleOnlineStatus}
           disabled={togglingOnline}
           variant={isOnline ? "destructive" : "default"}
-          className="text-sm flex items-center gap-2"
+          className="flex items-center gap-2 text-xs sm:text-sm"
         >
           {isOnline ? <FiWifiOff /> : <FiWifi />}
-          {togglingOnline ? "Updating..." : isOnline ? "Go Offline" : "Go Online"}
+          {togglingOnline
+            ? "Updating..."
+            : isOnline
+            ? "Go Offline"
+            : "Go Online"}
         </Button>
       </div>
 
@@ -314,18 +341,27 @@ export default function DriverDashboard() {
               type="text"
               placeholder="Subject"
               value={supportForm.subject}
-              onChange={(e) => setSupportForm({ ...supportForm, subject: e.target.value })}
+              onChange={(e) =>
+                setSupportForm({ ...supportForm, subject: e.target.value })
+              }
               className="w-full border p-2 rounded-md"
             />
             <textarea
               rows={4}
               placeholder="Describe your issue..."
               value={supportForm.message}
-              onChange={(e) => setSupportForm({ ...supportForm, message: e.target.value })}
+              onChange={(e) =>
+                setSupportForm({ ...supportForm, message: e.target.value })
+              }
               className="w-full border p-2 rounded-md"
             />
             <div className="flex justify-end gap-2">
-              <Button onClick={() => setShowSupportModal(false)} variant="outline">Cancel</Button>
+              <Button
+                onClick={() => setShowSupportModal(false)}
+                variant="outline"
+              >
+                Cancel
+              </Button>
               <Button onClick={submitSupportTicket} disabled={supportLoading}>
                 {supportLoading ? "Submitting..." : "Submit"}
               </Button>
@@ -336,7 +372,12 @@ export default function DriverDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {stats.map((stat, index) => (
-          <StatCard key={index} icon={stat.icon} title={stat.title} value={stat.value} />
+          <StatCard
+            key={index}
+            icon={stat.icon}
+            title={stat.title}
+            value={stat.value}
+          />
         ))}
       </div>
 
@@ -344,7 +385,9 @@ export default function DriverDashboard() {
         <h2 className="text-lg font-bold mb-2">Available Rides</h2>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {availableRides.length === 0 ? (
-            <p className="text-gray-600 col-span-full">No available rides at the moment.</p>
+            <p className="text-gray-600 col-span-full">
+              No available rides at the moment.
+            </p>
           ) : (
             availableRides.map((ride) => (
               <AvailableRideCard
