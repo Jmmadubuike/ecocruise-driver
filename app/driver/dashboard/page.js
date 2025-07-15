@@ -277,12 +277,13 @@ export default function DriverDashboard() {
 
   return (
     <div className="p-4 space-y-6">
-      <header className="mb-8 flex flex-col sm:flex-row sm:justify-between sm:items-center">
-        <h1 className="flex items-center gap-3 font-extrabold text-2xl md:text-3xl">
+      <header className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:justify-between sm:items-center">
+        <h1 className="flex items-center gap-2 font-bold text-xl md:text-2xl">
           <FiUser className="text-[#f80b0b]" />
-          Welcome back, <span className="text-[#004aad] dark:text-[#0070f3]">{displayName}</span>
+          Welcome back,{" "}
+          <span className="text-[#004aad] dark:text-[#0070f3]">{displayName}</span>
         </h1>
-        <p className="mt-2 sm:mt-0 text-gray-600 dark:text-gray-400 text-sm">
+        <p className="mt-2 sm:mt-0 text-sm text-gray-600 dark:text-gray-400">
           Here’s your dashboard summary at a glance.
         </p>
       </header>
