@@ -12,16 +12,13 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!loading && user) {
-      if (user.role === 'driver') {
-        router.replace('/driver/dashboard');
-      } else {
-        router.replace('/');
-      }
+      router.replace(user.role === 'driver' ? '/driver/dashboard' : '/');
     }
   }, [loading, user, router]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -37,38 +34,60 @@ export default function LoginPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <span className="loading loading-spinner loading-lg"></span>
+        <span className="loading loading-spinner loading-lg text-[#0057B7]"></span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-base-200">
+    <div className="min-h-screen flex items-center justify-center bg-base-200 px-4">
       <div className="card w-full max-w-md shadow-xl bg-base-100 p-8">
-        <h2 className="text-center text-2xl font-bold mb-4">Driver Login</h2>
-        {error && <div className="alert alert-error mb-4">{error}</div>}
+        <h2 className="text-2xl font-bold text-center mb-6 text-[#0057B7]">Driver Login</h2>
+
+        {error && (
+          <div className="rounded-md bg-[#d50000]/10 border border-[#d50000] text-[#d50000] px-4 py-2 mb-4 text-sm">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            className="input input-bordered w-full"
-            onChange={handleChange}
-            value={form.email}
-            required
-          />
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            className="input input-bordered w-full"
-            onChange={handleChange}
-            value={form.password}
-            required
-          />
+          <div>
+            <label htmlFor="email" className="label text-sm font-medium">
+              Email
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              className="input input-bordered w-full"
+              value={form.email}
+              onChange={handleChange}
+              required
+              aria-label="Email address"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="label text-sm font-medium">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Enter your password"
+              className="input input-bordered w-full"
+              value={form.password}
+              onChange={handleChange}
+              required
+              aria-label="Password"
+            />
+          </div>
+
           <button
             type="submit"
-            className="btn btn-primary w-full"
+            className="w-full py-2 text-white font-semibold rounded-md bg-[#0057B7] hover:bg-[#004ba0] transition duration-200"
             disabled={loading}
           >
             {loading ? 'Logging in...' : 'Login'}
