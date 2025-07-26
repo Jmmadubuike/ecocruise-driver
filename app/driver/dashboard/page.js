@@ -261,16 +261,16 @@ export default function DriverDashboard() {
       value: `₦${(data.totalEarnings || 0).toLocaleString()}`,
       icon: <FiDollarSign className="text-green-600" />,
     },
-    {
-      title: "Monthly Earnings",
-      value: `₦${(data.monthlyEarnings || 0).toLocaleString()}`,
-      icon: <FiTrendingUp className="text-blue-500" />,
-    },
-    {
-      title: "Daily Earnings",
-      value: `₦${(data.dailyEarnings || 0).toLocaleString()}`,
-      icon: <FiActivity className="text-yellow-500" />,
-    },
+    // {
+    //   title: "Monthly Earnings",
+    //   value: `₦${(data.monthlyEarnings || 0).toLocaleString()}`,
+    //   icon: <FiTrendingUp className="text-blue-500" />,
+    // },
+    // {
+    //   title: "Daily Earnings",
+    //   value: `₦${(data.dailyEarnings || 0).toLocaleString()}`,
+    //   icon: <FiActivity className="text-yellow-500" />,
+    // },
     {
       title: "Completed Rides",
       value: data.completedRides || 0,
