@@ -271,15 +271,15 @@ export default function DriverDashboard() {
     //   value: `₦${(data.dailyEarnings || 0).toLocaleString()}`,
     //   icon: <FiActivity className="text-yellow-500" />,
     // },
-    {
-      title: "Completed Rides",
-      value: data.completedRides || 0,
-      icon: <FiCheckCircle className="text-emerald-600" />,
-    },
+    // {
+    //   title: "Completed Rides",
+    //   value: data.completedRides || 0,
+    //   icon: <FiCheckCircle className="text-emerald-600" />,
+    // },
     {
       title: "Total Rides",
       value: data.totalRides || 0,
-      icon: <FiClock className="text-gray-500" />,
+      icon: <FiClock className="text-emerald-600" />,
     },
     {
       title: "Pending Withdrawals",
