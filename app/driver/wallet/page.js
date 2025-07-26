@@ -1,115 +1,143 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import axios from '@/lib/api';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import React from "react";
 import {
-  BanknotesIcon,
-  CreditCardIcon,
-  CalendarIcon,
-  CheckCircleIcon,
-  ClipboardDocumentCheckIcon,
-  ArrowPathRoundedSquareIcon,
-} from '@heroicons/react/24/outline';
+  FiUsers,
+  FiDollarSign,
+  FiMap,
+  FiTruck,
+  FiAlertCircle,
+  FiClock,
+  FiCreditCard,
+} from "react-icons/fi";
 
-export default function DriverWalletPage() {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const Card = ({
+  label,
+  value,
+  icon: Icon,
+  color,
+}: {
+  label: string;
+  value: string | number;
+  icon: React.ElementType;
+  color: string;
+}) => (
+  <div className="bg-white dark:bg-black p-4 rounded-2xl shadow-md border border-gray-200 dark:border-gray-800 flex items-center gap-4">
+    <div
+      className="p-3 rounded-full text-white"
+      style={{ backgroundColor: color }}
+    >
+      <Icon className="w-5 h-5" />
+    </div>
+    <div>
+      <h4 className="text-gray-600 dark:text-gray-300 text-sm font-medium">
+        {label}
+      </h4>
+      <p className="text-xl font-semibold text-gray-900 dark:text-white">
+        {value}
+      </p>
+    </div>
+  </div>
+);
+
+const DriverAnalytics = () => {
+  const [stats, setStats] = useState<any>({});
+  const { user } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res = await axios.get('/api/v1/driver/analytics');
-        const data = res.data.data;
+        const res = await fetch("/api/driver/analytics", {
+          method: "GET",
+          credentials: "include",
+        });
 
-        // Format server-stable values (locale-safe)
+        if (!res.ok) {
+          throw new Error("Failed to fetch analytics");
+        }
+
+        const { data } = await res.json();
+
         setStats({
-          totalEarnings: data.totalEarnings.toLocaleString('en-NG'),
-          dailyEarnings: data.dailyEarnings.toLocaleString('en-NG'),
-          monthlyEarnings: data.monthlyEarnings.toLocaleString('en-NG'),
+          totalEarnings: data.totalEarnings.toLocaleString("en-NG"),
+          availableBalance: data.availableBalance.toLocaleString("en-NG"),
+          dailyEarnings: data.dailyEarnings.toLocaleString("en-NG"),
+          monthlyEarnings: data.monthlyEarnings.toLocaleString("en-NG"),
           completedRides: data.completedRides,
           totalRides: data.totalRides,
           pendingWithdrawals: data.pendingWithdrawals,
         });
-      } catch (err) {
-        console.error('Error fetching analytics:', err);
-        setError('Failed to load wallet data.');
-      } finally {
-        setLoading(false);
+      } catch (err: any) {
+        console.error(err);
       }
     };
 
-    fetchAnalytics();
-  }, []);
+    if (user) {
+      fetchAnalytics();
+    }
+  }, [user]);
 
-  if (loading) return <div className="text-center p-4">Loading wallet info...</div>;
-  if (error) return <div className="text-center text-red-500">{error}</div>;
+  const cards = [
+    {
+      label: "Total Earnings",
+      value: `₦${stats.totalEarnings}`,
+      color: "#16a34a",
+      icon: FiDollarSign,
+    },
+    {
+      label: "Available Balance",
+      value: `₦${stats.availableBalance}`,
+      color: "#8b5cf6",
+      icon: FiCreditCard,
+    },
+    {
+      label: "Today's Earnings",
+      value: `₦${stats.dailyEarnings}`,
+      color: "#059669",
+      icon: FiClock,
+    },
+    {
+      label: "This Month",
+      value: `₦${stats.monthlyEarnings}`,
+      color: "#3b82f6",
+      icon: FiMap,
+    },
+    {
+      label: "Total Rides",
+      value: stats.totalRides,
+      color: "#ef4444",
+      icon: FiTruck,
+    },
+    {
+      label: "Completed Rides",
+      value: stats.completedRides,
+      color: "#f59e0b",
+      icon: FiUsers,
+    },
+    {
+      label: "Pending Withdrawals",
+      value: stats.pendingWithdrawals,
+      color: "#eab308",
+      icon: FiAlertCircle,
+    },
+  ];
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-[#004aad] mb-8">Driver Wallet & Earnings</h1>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[
-          {
-            label: 'Total Earnings',
-            value: `₦${stats.totalEarnings}`,
-            color: '#004aad',
-            icon: CreditCardIcon,
-          },
-          {
-            label: "Today's Earnings",
-            value: `₦${stats.dailyEarnings}`,
-            color: '#22c55e',
-            icon: BanknotesIcon,
-          },
-          {
-            label: 'Monthly Earnings',
-            value: `₦${stats.monthlyEarnings}`,
-            color: '#facc15',
-            icon: CalendarIcon,
-          },
-          {
-            label: 'Completed Rides',
-            value: stats.completedRides,
-            color: '#0ea5e9',
-            icon: CheckCircleIcon,
-          },
-          {
-            label: 'Total Rides',
-            value: stats.totalRides,
-            color: '#6b7280',
-            icon: ClipboardDocumentCheckIcon,
-          },
-          {
-            label: 'Pending Withdrawals',
-            value: stats.pendingWithdrawals,
-            color: '#f80b0b',
-            icon: ArrowPathRoundedSquareIcon,
-          },
-        ].map(({ label, value, color, icon: Icon }) => (
-          <div
-            key={label}
-            className="card bg-white shadow-lg p-5 rounded-xl border-l-4 hover:shadow-xl transition-all duration-200"
-            style={{ borderColor: color }}
-          >
-            <div className="flex items-center gap-4">
-              <div
-                className="p-3 rounded-full"
-                style={{ backgroundColor: `${color}20` }}
-              >
-                <Icon className="w-6 h-6" style={{ color }} />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 font-medium">{label}</p>
-                <p className="text-2xl font-bold" style={{ color }}>
-                  {value}
-                </p>
-              </div>
-            </div>
-          </div>
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-6 dark:text-white">
+        Driver Analytics
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {cards.map((card, i) => (
+          <Card key={i} {...card} />
         ))}
       </div>
     </div>
   );
-}
+};
+
+export default DriverAnalytics;
