@@ -23,7 +23,7 @@ const WithdrawalManagement = () => {
       try {
         const res = await api.get("/api/v1/driver/withdrawals");
         setWithdrawals(res.data.data);
-        setBalance(res.data.balance); // Set current balance
+        setBalance(typeof res.data.balance === "number" ? res.data.balance : 0);
       } catch (err) {
         setError("Failed to fetch withdrawal history.");
       } finally {
