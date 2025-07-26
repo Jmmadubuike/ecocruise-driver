@@ -61,18 +61,19 @@ const DriverAnalytics = () => {
         }
 
         const { data } = await res.json();
+        console.log("Driver analytics data:", data); // Debug
 
         setStats({
-          totalEarnings: data.totalEarnings.toLocaleString("en-NG"),
-          availableBalance: data.availableBalance.toLocaleString("en-NG"),
-          dailyEarnings: data.dailyEarnings.toLocaleString("en-NG"),
-          monthlyEarnings: data.monthlyEarnings.toLocaleString("en-NG"),
-          completedRides: data.completedRides,
-          totalRides: data.totalRides,
-          pendingWithdrawals: data.pendingWithdrawals,
+          totalEarnings: data?.totalEarnings?.toLocaleString("en-NG") || "0",
+          availableBalance: data?.availableBalance?.toLocaleString("en-NG") || "0",
+          dailyEarnings: data?.dailyEarnings?.toLocaleString("en-NG") || "0",
+          monthlyEarnings: data?.monthlyEarnings?.toLocaleString("en-NG") || "0",
+          completedRides: data?.completedRides ?? 0,
+          totalRides: data?.totalRides ?? 0,
+          pendingWithdrawals: data?.pendingWithdrawals ?? 0,
         });
       } catch (err: any) {
-        console.error(err);
+        console.error("Error fetching analytics:", err);
       }
     };
 
