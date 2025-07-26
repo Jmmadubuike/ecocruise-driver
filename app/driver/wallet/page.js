@@ -50,7 +50,7 @@ export default function DriverWalletPage() {
         value={`₦${stats.totalEarnings?.toFixed(2) || '0.00'}`}
         icon={<CreditCardIcon className="w-6 h-6 text-blue-600" />}
       />
-      <WalletStat
+      {/* <WalletStat
         label="Daily Earnings"
         value={`₦${stats.dailyEarnings?.toFixed(2) || '0.00'}`}
         icon={<CalendarIcon className="w-6 h-6 text-orange-600" />}
@@ -59,7 +59,7 @@ export default function DriverWalletPage() {
         label="Monthly Earnings"
         value={`₦${stats.monthlyEarnings?.toFixed(2) || '0.00'}`}
         icon={<ClipboardDocumentCheckIcon className="w-6 h-6 text-purple-600" />}
-      />
+      /> */}
       <WalletStat
         label="Completed Rides"
         value={stats.completedRides}

@@ -64,7 +64,7 @@ export default function WithdrawalManagement() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <div className="text-center space-y-2">
+      {/* <div className="text-center space-y-2">
         <h2 className="text-2xl font-bold text-[#004aad]">Withdrawal Wallet</h2>
         <p className="text-sm text-gray-500">
           Wallet Balance:{' '}
@@ -72,7 +72,7 @@ export default function WithdrawalManagement() {
             ₦{balance.toLocaleString('en-NG')}
           </span>
         </p>
-      </div>
+      </div> */}
 
       <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border-l-4 border-[#004aad] shadow">
         <label className="text-sm font-semibold block mb-1">
