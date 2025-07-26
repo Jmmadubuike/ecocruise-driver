@@ -41,7 +41,7 @@ export default function DriverRideHistoryPage() {
         ...prev,
         page: meta?.page || 1,
         totalPages: meta?.totalPages || 1,
-        totalItems: meta?.total || 0, // ✅ FIXED
+        totalItems: meta?.totalItems || 0, // ✅ correctly fetch totalItems
       }));
     } catch (err) {
       console.error("Error loading rides:", err);

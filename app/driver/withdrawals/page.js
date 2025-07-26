@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 
 const WithdrawalManagement = () => {
   const [withdrawals, setWithdrawals] = useState([]);
+  const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [amount, setAmount] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -22,6 +23,7 @@ const WithdrawalManagement = () => {
       try {
         const res = await api.get("/api/v1/driver/withdrawals");
         setWithdrawals(res.data.data);
+        setBalance(res.data.balance); // Set current balance
       } catch (err) {
         setError("Failed to fetch withdrawal history.");
       } finally {
@@ -43,6 +45,7 @@ const WithdrawalManagement = () => {
 
       const updated = await api.get("/api/v1/driver/withdrawals");
       setWithdrawals(updated.data.data);
+      setBalance(updated.data.balance); // Refresh balance
       setPage(1); // Reset to first page
     } catch (err) {
       setError(err.response?.data?.error || "Withdrawal failed.");
@@ -61,12 +64,24 @@ const WithdrawalManagement = () => {
   return (
     <div className="px-4 py-6 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-6">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-[#004aad] mb-1">Withdrawal Management</h2>
-        <p className="text-sm text-gray-500">Manage and track your wallet withdrawals</p>
+        <h2 className="text-3xl font-bold text-[#004aad] mb-1">
+          Withdrawal Management
+        </h2>
+        <div className="mt-2 text-sm text-gray-700 font-medium">
+          Wallet Balance:{" "}
+          <span className="text-[#004aad] font-bold">
+            ₦{balance.toLocaleString("en-NG")}
+          </span>
+        </div>
+        <p className="text-sm text-gray-500 mt-1">
+          Manage and track your wallet withdrawals
+        </p>
       </div>
 
       <div className="bg-white rounded-xl shadow-lg p-5 sm:p-6 space-y-4 border-l-4 border-[#004aad]">
-        <label className="block text-sm font-semibold text-gray-700">Amount to Withdraw</label>
+        <label className="block text-sm font-semibold text-gray-700">
+          Amount to Withdraw
+        </label>
         <input
           type="number"
           value={amount}
@@ -82,11 +97,15 @@ const WithdrawalManagement = () => {
           {submitting ? "Submitting..." : "Request Withdrawal"}
         </Button>
         {error && <p className="text-sm text-[#f80b0b]">{error}</p>}
-        {successMessage && <p className="text-sm text-green-600">{successMessage}</p>}
+        {successMessage && (
+          <p className="text-sm text-green-600">{successMessage}</p>
+        )}
       </div>
 
       <div>
-        <h3 className="text-xl font-semibold mb-3 text-[#004aad]">Withdrawal History</h3>
+        <h3 className="text-xl font-semibold mb-3 text-[#004aad]">
+          Withdrawal History
+        </h3>
         {loading ? (
           <p className="text-sm text-gray-500">Loading...</p>
         ) : withdrawals.length === 0 ? (
