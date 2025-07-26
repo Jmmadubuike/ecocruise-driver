@@ -24,8 +24,8 @@ export default function EarningsPage() {
         <p className="text-2xl">₦{data.monthlyEarnings}</p>
       </div>
       <div className="card p-4 bg-accent text-accent-content">
-        <h2>Daily Earnings</h2>
-        <p className="text-2xl">₦{data.dailyEarnings}</p>
+        <h2>available Balance Earnings</h2>
+        <p className="text-2xl">₦{data.availableBalance}</p>
       </div>
     </div>
   );

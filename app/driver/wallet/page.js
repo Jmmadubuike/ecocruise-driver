@@ -1,144 +1,87 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
-import React from "react";
+import { useEffect, useState } from 'react';
+import axios from '@/lib/api';
 import {
-  FiUsers,
-  FiDollarSign,
-  FiMap,
-  FiTruck,
-  FiAlertCircle,
-  FiClock,
-  FiCreditCard,
-} from "react-icons/fi";
+  BanknotesIcon,
+  CreditCardIcon,
+  CalendarIcon,
+  CheckCircleIcon,
+  ClipboardDocumentCheckIcon,
+  ArrowPathRoundedSquareIcon,
+} from '@heroicons/react/24/outline';
 
-const Card = ({
-  label,
-  value,
-  icon: Icon,
-  color,
-}: {
-  label: string;
-  value: string | number;
-  icon: React.ElementType;
-  color: string;
-}) => (
-  <div className="bg-white dark:bg-black p-4 rounded-2xl shadow-md border border-gray-200 dark:border-gray-800 flex items-center gap-4">
-    <div
-      className="p-3 rounded-full text-white"
-      style={{ backgroundColor: color }}
-    >
-      <Icon className="w-5 h-5" />
-    </div>
-    <div>
-      <h4 className="text-gray-600 dark:text-gray-300 text-sm font-medium">
-        {label}
-      </h4>
-      <p className="text-xl font-semibold text-gray-900 dark:text-white">
-        {value}
-      </p>
-    </div>
-  </div>
-);
-
-const DriverAnalytics = () => {
-  const [stats, setStats] = useState<any>({});
-  const { user } = useAuth();
-  const router = useRouter();
+export default function DriverWalletPage() {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res = await fetch("/api/driver/analytics", {
-          method: "GET",
-          credentials: "include",
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch analytics");
-        }
-
-        const { data } = await res.json();
-        console.log("Driver analytics data:", data); // Debug
-
-        setStats({
-          totalEarnings: data?.totalEarnings?.toLocaleString("en-NG") || "0",
-          availableBalance: data?.availableBalance?.toLocaleString("en-NG") || "0",
-          dailyEarnings: data?.dailyEarnings?.toLocaleString("en-NG") || "0",
-          monthlyEarnings: data?.monthlyEarnings?.toLocaleString("en-NG") || "0",
-          completedRides: data?.completedRides ?? 0,
-          totalRides: data?.totalRides ?? 0,
-          pendingWithdrawals: data?.pendingWithdrawals ?? 0,
-        });
-      } catch (err: any) {
-        console.error("Error fetching analytics:", err);
+        const res = await axios.get('/api/v1/driver/analytics');
+        setStats(res.data.data); // Set only the data object
+      } catch (err) {
+        console.error('Failed to fetch analytics:', err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    if (user) {
-      fetchAnalytics();
-    }
-  }, [user]);
+    fetchAnalytics();
+  }, []);
 
-  const cards = [
-    {
-      label: "Total Earnings",
-      value: `₦${stats.totalEarnings}`,
-      color: "#16a34a",
-      icon: FiDollarSign,
-    },
-    {
-      label: "Available Balance",
-      value: `₦${stats.availableBalance}`,
-      color: "#8b5cf6",
-      icon: FiCreditCard,
-    },
-    {
-      label: "Today's Earnings",
-      value: `₦${stats.dailyEarnings}`,
-      color: "#059669",
-      icon: FiClock,
-    },
-    {
-      label: "This Month",
-      value: `₦${stats.monthlyEarnings}`,
-      color: "#3b82f6",
-      icon: FiMap,
-    },
-    {
-      label: "Total Rides",
-      value: stats.totalRides,
-      color: "#ef4444",
-      icon: FiTruck,
-    },
-    {
-      label: "Completed Rides",
-      value: stats.completedRides,
-      color: "#f59e0b",
-      icon: FiUsers,
-    },
-    {
-      label: "Pending Withdrawals",
-      value: stats.pendingWithdrawals,
-      color: "#eab308",
-      icon: FiAlertCircle,
-    },
-  ];
+  if (loading) {
+    return <div className="p-4">Loading wallet...</div>;
+  }
+
+  if (!stats) {
+    return <div className="p-4 text-red-600">Error loading wallet data</div>;
+  }
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6 dark:text-white">
-        Driver Analytics
-      </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {cards.map((card, i) => (
-          <Card key={i} {...card} />
-        ))}
+    <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <WalletStat
+        label="Available Balance"
+        value={`₦${stats.availableBalance?.toFixed(2) || '0.00'}`}
+        icon={<BanknotesIcon className="w-6 h-6 text-green-600" />}
+      />
+      <WalletStat
+        label="Total Earnings"
+        value={`₦${stats.totalEarnings?.toFixed(2) || '0.00'}`}
+        icon={<CreditCardIcon className="w-6 h-6 text-blue-600" />}
+      />
+      <WalletStat
+        label="Daily Earnings"
+        value={`₦${stats.dailyEarnings?.toFixed(2) || '0.00'}`}
+        icon={<CalendarIcon className="w-6 h-6 text-orange-600" />}
+      />
+      <WalletStat
+        label="Monthly Earnings"
+        value={`₦${stats.monthlyEarnings?.toFixed(2) || '0.00'}`}
+        icon={<ClipboardDocumentCheckIcon className="w-6 h-6 text-purple-600" />}
+      />
+      <WalletStat
+        label="Completed Rides"
+        value={stats.completedRides}
+        icon={<CheckCircleIcon className="w-6 h-6 text-teal-600" />}
+      />
+      <WalletStat
+        label="Pending Withdrawals"
+        value={stats.pendingWithdrawals}
+        icon={<ArrowPathRoundedSquareIcon className="w-6 h-6 text-red-600" />}
+      />
+    </div>
+  );
+}
+
+function WalletStat({ label, value, icon }) {
+  return (
+    <div className="bg-white dark:bg-zinc-800 shadow rounded-2xl p-4 flex items-center space-x-4">
+      <div>{icon}</div>
+      <div>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
+        <p className="text-lg font-semibold text-gray-900 dark:text-white">{value}</p>
       </div>
     </div>
   );
-};
-
-export default DriverAnalytics;
+}
