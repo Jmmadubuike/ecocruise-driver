@@ -35,10 +35,13 @@ export default function SidebarNav() {
       className={`
         fixed sm:sticky
         bottom-0 sm:top-0
-        left-0 right-0 sm:left-auto sm:right-auto
+        left-0 right-0
+        sm:left-auto sm:right-auto
         w-full sm:w-64
         z-30
-        bg-base-100 border-t sm:border-t-0 sm:border-r border-base-300 shadow-lg
+        bg-white sm:bg-base-100
+        border-t sm:border-t-0 sm:border-r border-base-300
+        shadow-md sm:shadow-lg
         flex sm:flex-col flex-row
         justify-between sm:justify-start
         items-center sm:items-start
@@ -56,12 +59,13 @@ export default function SidebarNav() {
             href={href}
             className={`
               group flex sm:flex-row flex-col
-              items-center justify-center sm:justify-start
-              sm:items-center gap-1 sm:gap-3
-              w-full sm:w-full
-              px-2 sm:px-4 py-2 sm:py-3
+              items-center justify-center
+              flex-1 sm:w-full min-w-0
+              gap-1 sm:gap-3
+              px-1 sm:px-4 py-2 sm:py-3
               rounded-lg text-xs sm:text-sm font-medium
               transition-all duration-200
+              ${isActive ? "shadow-md" : ""}
             `}
             aria-current={isActive ? "page" : undefined}
             style={{
@@ -77,11 +81,10 @@ export default function SidebarNav() {
             }}
           >
             <Icon
-              className="w-5 h-5"
-              style={{ color: isActive ? ACTIVE_TEXT : ACTIVE_BG }}
+              className={`w-5 h-5 ${isActive ? "text-white" : "text-[#004aad]"}`}
               aria-hidden="true"
             />
-            <span className="truncate">{label}</span>
+            <span className="hidden sm:inline truncate">{label}</span>
           </Link>
         );
       })}
