@@ -2,17 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 import {
   HomeIcon,
   ClockIcon,
-  MapIcon,
-  UserCircleIcon,
   WalletIcon,
   TicketIcon,
   BellIcon,
-  Bars3Icon,
-  XMarkIcon,
+  UserCircleIcon,
 } from "@heroicons/react/24/outline";
 
 const navLinks = [
@@ -33,64 +29,62 @@ const INACTIVE_TEXT = "#333333";
 
 export default function SidebarNav() {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
-
-  const closeSidebar = () => setIsOpen(false);
-  const toggleSidebar = () => setIsOpen((prev) => !prev);
 
   return (
-    <>
-      {/* Mobile Top Bar */}
-      <div className="sm:hidden p-4 flex justify-between items-center bg-base-100 border-b border-base-300 shadow-md">
-        <button
-          onClick={toggleSidebar}
-          className="text-[#004aad] focus:outline-none"
-          aria-label="Toggle navigation menu"
-        >
-          {isOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
-        </button>
-        <span className="font-bold text-[#004aad] text-lg">Menu</span>
-      </div>
+    <nav
+      className={`
+        fixed sm:sticky
+        bottom-0 sm:top-0
+        left-0 right-0 sm:left-auto sm:right-auto
+        w-full sm:w-64
+        z-30
+        bg-base-100 border-t sm:border-t-0 sm:border-r border-base-300 shadow-lg
+        flex sm:flex-col flex-row
+        justify-between sm:justify-start
+        items-center sm:items-start
+        px-2 sm:px-4 py-2 sm:py-4
+        space-y-0 sm:space-y-1
+      `}
+      aria-label="Driver navigation"
+    >
+      {navLinks.map(({ href, label, icon: Icon }) => {
+        const isActive = pathname === href;
 
-      {/* Sidebar */}
-      <nav
-        className={`${
-          isOpen ? "block" : "hidden"
-        } sm:flex flex-col bg-base-100 border-r border-base-300 shadow-lg h-screen sticky top-0 p-4 space-y-1 w-full sm:w-64 z-30`}
-        aria-label="Driver navigation"
-      >
-        {navLinks.map(({ href, label, icon: Icon }) => {
-          const isActive = pathname === href;
-
-          return (
-            <Link
-              key={href}
-              href={href}
-              onClick={closeSidebar} // ✅ Close sidebar on click (mobile)
-              className="group flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200"
-              aria-current={isActive ? "page" : undefined}
-              style={{
-                backgroundColor: isActive ? ACTIVE_BG : undefined,
-                color: isActive ? ACTIVE_TEXT : INACTIVE_TEXT,
-                boxShadow: isActive ? "0 0 10px rgba(0,74,173,0.6)" : undefined,
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) e.currentTarget.style.backgroundColor = HOVER_BG;
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) e.currentTarget.style.backgroundColor = "";
-              }}
-            >
-              <Icon
-                className="w-5 h-5 transition-transform duration-200"
-                style={{ color: isActive ? ACTIVE_TEXT : ACTIVE_BG }}
-                aria-hidden="true"
-              />
-              <span className="truncate">{label}</span> {/* ✅ Always show text */}
-            </Link>
-          );
-        })}
-      </nav>
-    </>
+        return (
+          <Link
+            key={href}
+            href={href}
+            className={`
+              group flex sm:flex-row flex-col
+              items-center justify-center sm:justify-start
+              sm:items-center gap-1 sm:gap-3
+              w-full sm:w-full
+              px-2 sm:px-4 py-2 sm:py-3
+              rounded-lg text-xs sm:text-sm font-medium
+              transition-all duration-200
+            `}
+            aria-current={isActive ? "page" : undefined}
+            style={{
+              backgroundColor: isActive ? ACTIVE_BG : undefined,
+              color: isActive ? ACTIVE_TEXT : INACTIVE_TEXT,
+              boxShadow: isActive ? "0 0 10px rgba(0,74,173,0.6)" : undefined,
+            }}
+            onMouseEnter={(e) => {
+              if (!isActive) e.currentTarget.style.backgroundColor = HOVER_BG;
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive) e.currentTarget.style.backgroundColor = "";
+            }}
+          >
+            <Icon
+              className="w-5 h-5"
+              style={{ color: isActive ? ACTIVE_TEXT : ACTIVE_BG }}
+              aria-hidden="true"
+            />
+            <span className="truncate">{label}</span>
+          </Link>
+        );
+      })}
+    </nav>
   );
 }
